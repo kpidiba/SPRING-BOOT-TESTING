@@ -28,8 +28,9 @@ public class BookController {
      * @return a list of all books
      */
     @GetMapping
-    public List<Book> index() {
-        return this.service.getAll();
+    public ResponseEntity<List<Book>> index() {
+        List<Book> books = this.service.getAll();
+        return ResponseEntity.ok(books);
     }
 
     /**
@@ -40,8 +41,13 @@ public class BookController {
      * @return the book with the specified id
      */
     @GetMapping(value = "/{id}", produces = "application/json")
-    public Book getBookById(@PathVariable("id") Integer id) {
-        return this.service.findById(id);
+    public ResponseEntity<Void> getBookById(@PathVariable("id") Integer id) {
+        try {
+            this.service.findById(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**
@@ -64,8 +70,13 @@ public class BookController {
      * @return the updated book
      */
     @PutMapping("/{id}")
-    public Book update(@RequestBody Book book, @PathVariable("id") Integer id) {
-        return this.service.update(book, id);
+    public ResponseEntity<Void> update(@RequestBody Book book, @PathVariable("id") Integer id) {
+        try {
+            this.service.update(book, id);
+        return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
     }
 
     /**
@@ -75,8 +86,9 @@ public class BookController {
      * @param id the id of the book to delete
      */
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") Integer id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") Integer id) {
         this.service.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
 }

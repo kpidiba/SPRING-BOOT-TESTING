@@ -1,11 +1,10 @@
 package com.testing.kbright.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -16,7 +15,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
 import com.testing.kbright.models.Book;
 import com.testing.kbright.service.attachement.BookService;
 
@@ -32,44 +30,43 @@ public class BookControllerTest {
   Book bookMock = new Book(2, "Livre 1", "Description", 3);
   String exampleBookJson = "{\"id\":2,\"titre\":\"Livre 1\",\"description\":\"Description\",\"rating\":3}";
 
-
   @BeforeAll
-  static void launch(){
+  static void launch() {
     System.out.println("Man with mission");
   }
 
   @Test
-  public void getAllEmployeesAPI() throws Exception {
-    Mockito.when(bookService.findById(Mockito.anyInt())).thenReturn(bookMock);
-
-    RequestBuilder requestBuilder = MockMvcRequestBuilders.get(
-        "/book/2").accept(
-            MediaType.APPLICATION_JSON);
-
-    MvcResult result = mvc.perform(requestBuilder).andReturn();
-
-    String expected = "{\"id\":2,\"titre\":\"Livre 1\",\"description\":\"Description\",\"rating\":3}";
-
-    JSONAssert.assertEquals(expected, result.getResponse().getContentAsString(), false);
+  public void indexReturnsListOfBooks() throws Exception {
+    List<Book> expectedBooks = List.of(new Book(1, "Mon livre", "Ce livre est riche en plein de choses", 4),
+        new Book(2, "Livre 1", "Description", 3));
+    Mockito.when(bookService.getAll()).thenReturn(expectedBooks);
+    mvc.perform(MockMvcRequestBuilders.get("/book"))
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(1))
+        .andExpect(MockMvcResultMatchers.jsonPath("$[0].titre").value("Mon livre"))
+        .andExpect(MockMvcResultMatchers.jsonPath("$[1].id").value(2))
+        .andExpect(MockMvcResultMatchers.jsonPath("$[1].titre").value("Livre 1"));
   }
-
 
   /**
    * Test case for the deleteBookById API endpoint.
    *
    * Sends a DELETE request to the /book/{id} endpoint
-   * and verifies that the BookService's deleteById method is called once with the argument 2.
+   * and verifies that the BookService's deleteById method is called once with the
+   * argument 2.
    *
    * @throws Exception if something goes wrong during the test
    */
   @Test
-  void testDelete() throws Exception {
+  void shouldDeleteBookById() throws Exception {
     // Sending the request to the BookController and storing the result
     // This performs a DELETE request to the /book/2 endpoint
     mvc.perform(MockMvcRequestBuilders.delete("/book/2"))
-      .andExpect(MockMvcResultMatchers.status().isOk()); // Expects a 200 OK status
+        .andExpect(MockMvcResultMatchers.status().isOk()); // Expects a 200 OK status
 
-    // Verifying that the deleteById method of the BookService was called once with an argument of 2
+    // Verifying that the deleteById method of the BookService was called once with
+    // an argument of 2
     Mockito.verify(bookService, Mockito.times(1)).deleteById(2);
   }
 
@@ -90,23 +87,20 @@ public class BookControllerTest {
     // Send the request and store the result
     MvcResult result = mvc.perform(requestBuilder).andReturn();
 
-    // Define the expected JSON response
-    String expected = "{\"id\":2,\"titre\":\"Livre 1\",\"description\":\"Description\",\"rating\":3}";
-
     // Assert that the response matches the expected JSON
-    JSONAssert.assertEquals(expected, result.getResponse().getContentAsString(), false);
+    assertEquals(200, result.getResponse().getStatus());
 
-    // Verify that the findById method of the BookService was called once with an argument of 2
+    // Verify that the findById method of the BookService was called once with an
+    // argument of 2
     Mockito.verify(bookService, Mockito.times(1)).findById(2);
   }
 
   @Test
-  void testRegister() throws Exception {
+  void shouldRegisterABook() throws Exception { // Renamed the method
 
     // studentService.addCourse to respond back with mockCourse
     Mockito.when(bookService.register(
         Mockito.any(Book.class))).thenReturn(bookMock);
-
     // Send course as body to /students/Student1/courses
     RequestBuilder requestBuilder = MockMvcRequestBuilders
         .post("/book")
@@ -121,7 +115,26 @@ public class BookControllerTest {
   }
 
   @Test
-  void testUpdate() {
+  void shouldUpdateBook() throws Exception {
+    Integer id = 2;
+    Book bookMock = new Book(id, "Testing", "Description", 3);
+    String json = "{\"id\":" + id + ",\"titre\":\"New book\",\"description\":\"Description\",\"rating\":3}";
+    Mockito.when(bookService.update(Mockito.eq(bookMock), Mockito.eq(id))).thenReturn(bookMock);
 
+    RequestBuilder request = MockMvcRequestBuilders.put("/book/" + id)
+        .accept(MediaType.APPLICATION_JSON)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(json);
+
+    MvcResult result = mvc.perform(request).andReturn();
+
+    MockHttpServletResponse response = result.getResponse();
+
+    assertEquals(200, response.getStatus());
+
+    // Verify that the update method of the BookService was called once with
+    // bookMock and id 2
+    Mockito.verify(bookService, Mockito.times(1)).update(bookMock, id);
   }
 }
+

@@ -10,4 +10,6 @@ public class KbrightApplication {
 		SpringApplication.run(KbrightApplication.class, args);
 	}
 
+	
+
 }

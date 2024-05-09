@@ -27,14 +27,32 @@ public class BookControllerTest {
   @MockBean
   private BookService bookService;
 
+  /**
+   * Mock book used in tests. Contains id, title, description and rating
+   */
   Book bookMock = new Book(2, "Livre 1", "Description", 3);
+
+  /**
+   * JSON string representation of the bookMock
+   */
   String exampleBookJson = "{\"id\":2,\"titre\":\"Livre 1\",\"description\":\"Description\",\"rating\":3}";
 
+  /**
+   * Before all hook, prints a message
+   */
   @BeforeAll
   static void launch() {
     System.out.println("Man with mission");
   }
 
+  /**
+   * Test case for the index API endpoint.
+   *
+   * Sends a GET request to the /book endpoint
+   * and verifies that the response is a list of books.
+   *
+   * @throws Exception if something goes wrong during the test
+   */
   @Test
   public void indexReturnsListOfBooks() throws Exception {
     List<Book> expectedBooks = List.of(new Book(1, "Mon livre", "Ce livre est riche en plein de choses", 4),

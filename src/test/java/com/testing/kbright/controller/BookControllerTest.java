@@ -152,6 +152,5 @@ public class BookControllerTest {
     MockHttpServletResponse response = result.getResponse();
 
     assertEquals(200, response.getStatus());
-
   }
 }

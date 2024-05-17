@@ -41,10 +41,10 @@ public class BookController {
      * @return the book with the specified id
      */
     @GetMapping(value = "/{id}", produces = "application/json")
-    public ResponseEntity<Void> getBookById(@PathVariable("id") Integer id) {
+    public ResponseEntity<Book> getBookById(@PathVariable("id") Integer id) {
         try {
-            this.service.findById(id);
-            return ResponseEntity.ok().build();
+            Book book = this.service.findById(id);
+            return ResponseEntity.ok(book);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

@@ -52,7 +52,7 @@ public class BookServiceImpl implements BookService {
      */
     @Override
     public Book findById(Integer id) {
-        return this.repository.findById(id).get();
+        return this.repository.findBookById(id);
     }
 
     /**

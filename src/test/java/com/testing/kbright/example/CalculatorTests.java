@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.testing.kbright.Calculator;
+import com.testing.kbright.models.Calculator;
 
 /**
  * This class contains unit tests for the Calculator class.

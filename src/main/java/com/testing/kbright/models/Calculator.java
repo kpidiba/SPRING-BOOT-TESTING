@@ -1,4 +1,4 @@
-package com.testing.kbright;
+package com.testing.kbright.models;
 
 public class Calculator {
     public int multiply(int x,int y){
